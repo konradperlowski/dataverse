@@ -198,6 +198,9 @@ public class SettingsServiceBean {
         Authority,
         /** DoiProvider for global id */
         DoiProvider,
+        /** Fields necessary for CrossRef */
+        Depositor,
+        DepositorEmail,
         /** Shoulder for global id - used to create a common prefix on identifiers */
         Shoulder,
         /* Removed for now - tried to add here but DOI Service Bean didn't like it at start-up

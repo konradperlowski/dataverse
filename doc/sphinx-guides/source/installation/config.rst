@@ -2074,7 +2074,7 @@ By default the footer says "Copyright © [YYYY]" but you can add text after the 
 :DoiProvider
 ++++++++++++
 
-As of this writing "DataCite" and "EZID" are the only valid options for production installations. Developers using Dataverse Software 4.10+ are welcome to use the keyword "FAKE" to configure a non-production installation with an non-resolving, in-code provider, which will basically short-circuit the DOI publishing process. ``:DoiProvider`` is only needed if you are using DOI.
+As of this writing "DataCite", "CrossRef" and "EZID" are the only valid options for production installations. Developers using Dataverse Software 4.10+ are welcome to use the keyword "FAKE" to configure a non-production installation with an non-resolving, in-code provider, which will basically short-circuit the DOI publishing process. ``:DoiProvider`` is only needed if you are using DOI.
 
 ``curl -X PUT -d DataCite http://localhost:8080/api/admin/settings/:DoiProvider``
 

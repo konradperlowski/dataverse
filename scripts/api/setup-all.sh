@@ -58,6 +58,8 @@ curl -X PUT -d doi "$SERVER/admin/settings/:Protocol"
 curl -X PUT -d 10.5072 "$SERVER/admin/settings/:Authority"
 curl -X PUT -d "FK2/" "$SERVER/admin/settings/:Shoulder"
 curl -X PUT -d DataCite "$SERVER/admin/settings/:DoiProvider"
+curl -X PUT -d Depositor "$SERVER/admin/settings/:Depositor"
+curl -X PUT -d DepositorEmail "$SERVER/admin/settings/:DepositorEmail"
 curl -X PUT -d burrito $SERVER/admin/settings/BuiltinUsers.KEY
 curl -X PUT -d localhost-only $SERVER/admin/settings/:BlockedApiPolicy
 curl -X PUT -d 'native/http' $SERVER/admin/settings/:UploadMethods

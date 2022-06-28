@@ -383,7 +383,7 @@
             <artifactId>oauth2-oidc-sdk</artifactId>
             <version>9.41.1</version>
         </dependency>
-        <!-- New and Improved GDCC XOAI library! --> 
+        <!-- New and Improved GDCC XOAI library! -->
         <dependency>
             <groupId>io.gdcc</groupId>
             <artifactId>xoai-data-provider</artifactId>
@@ -498,6 +498,12 @@
             <groupId>edu.ucar</groupId>
             <artifactId>cdm-core</artifactId>
             <version>${netcdf.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>fluent-hc</artifactId>
+            <version>4.5.13</version>
         </dependency>
 
         <!-- TESTING DEPENDENCIES -->
