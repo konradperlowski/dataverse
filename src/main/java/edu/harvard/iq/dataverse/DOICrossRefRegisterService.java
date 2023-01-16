@@ -12,13 +12,12 @@ import javax.persistence.TypedQuery;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static edu.harvard.iq.dataverse.util.SystemConfig.SITE_URL;
+import static edu.harvard.iq.dataverse.util.SystemConfig.getDataverseSiteUrlStatic;
 
 @Stateless
 public class DOICrossRefRegisterService {
@@ -253,7 +252,7 @@ class CrossRefMetadataTemplate {
     private String databaseTitle;
     private String identifier;
     private String title;
-    private final String baseUrl = System.getProperty(SITE_URL);
+    private final String baseUrl = System.getProperty(getDataverseSiteUrlStatic());
     private List<DatasetAuthor> authors;
 
     public List<DatasetAuthor> getAuthors() {
