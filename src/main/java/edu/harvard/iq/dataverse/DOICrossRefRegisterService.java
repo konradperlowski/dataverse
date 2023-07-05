@@ -12,6 +12,7 @@ import javax.persistence.TypedQuery;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
@@ -40,8 +41,7 @@ public class DOICrossRefRegisterService {
 
     private CrossRefRESTfullClient getClient() {
         if (client == null) {
-//            client = new CrossRefRESTfullClient(System.getProperty("doi.baseurlstring"), System.getProperty("doi.username"), System.getProperty("doi.password"));
-            client = new CrossRefRESTfullClient("https://test.crossref.org", "cyfronet", "z9vHGMPaK3SUgeV");
+            client = new CrossRefRESTfullClient(System.getProperty("doi.baseurlstring"), System.getProperty("doi.username"), System.getProperty("doi.password"));
         }
         return client;
     }
@@ -59,7 +59,6 @@ public class DOICrossRefRegisterService {
     }
 
     public String reserveIdentifier(String identifier, Map<String, String> metadata, DvObject dvObject) throws IOException {
-        String retString;
         String xmlMetadata = getMetadataFromDvObject(identifier, dvObject);
         DOIDataCiteRegisterCache rc = findByDOI(identifier);
         String target = metadata.get("_target");
@@ -72,15 +71,11 @@ public class DOICrossRefRegisterService {
             }
         }
 
-        CrossRefRESTfullClient client = getClient();
-        retString = client.postMetadata(xmlMetadata);
-
-        return retString;
+        return identifier;
     }
 
-    public String registerIdentifier(String identifier, Map<String, String> metadata, DvObject dvObject) throws IOException {
+    public void registerIdentifier(String identifier, Map<String, String> metadata, DvObject dvObject) throws IOException {
         logger.info("Register");
-        String retString;
         String xmlMetadata = getMetadataFromDvObject(identifier, dvObject);
         DOIDataCiteRegisterCache rc = findByDOI(identifier);
         String target = metadata.get("_target");
@@ -96,10 +91,7 @@ public class DOICrossRefRegisterService {
         }
 
         CrossRefRESTfullClient client = getClient();
-        retString = client.postMetadata(xmlMetadata);
-//        client.postUrl(identifier.substring(identifier.indexOf(":") + 1), target);
-
-        return retString;
+        client.postMetadata(xmlMetadata);
     }
 
 
@@ -148,68 +140,58 @@ public class DOICrossRefRegisterService {
         return null;
     }
 
-    public String modifyIdentifier(String identifier, HashMap<String, String> metadata, DvObject dvObject) throws IOException {
-//
+    public void modifyIdentifier(String identifier, HashMap<String, String> metadata, DvObject dvObject) throws IOException {
+        logger.info("Crossref modifyIdentifier");
         String xmlMetadata = getMetadataFromDvObject(identifier, dvObject);
 
-        logger.fine("XML to send to DataCite: " + xmlMetadata);
+        logger.fine("XML to send to CrossRef: " + xmlMetadata);
 
-        String status = metadata.get("_status").trim();
+
+        for (Map.Entry<String, String> entry : metadata.entrySet()) {
+            logger.info(entry.getKey() + ": " + entry.getValue());
+        }
+
         String target = metadata.get("_target");
-        String retString = "";
-//        if (status.equals("reserved")) {
-//            DOIDataCiteRegisterCache rc = findByDOI(identifier);
-//            if (rc == null) {
-//                rc = new DOIDataCiteRegisterCache();
-//                rc.setDoi(identifier);
-//                rc.setXml(xmlMetadata);
-//                rc.setStatus("reserved");
-//                rc.setUrl(target);
-//                em.persist(rc);
-//            } else {
-//                rc.setDoi(identifier);
-//                rc.setXml(xmlMetadata);
-//                rc.setStatus("reserved");
-//                rc.setUrl(target);
-//            }
-//            retString = "success to reserved " + identifier;
-//        } else if (status.equals("public")) {
-//            DOIDataCiteRegisterCache rc = findByDOI(identifier);
-//            if (rc != null) {
-//                rc.setDoi(identifier);
-//                rc.setXml(xmlMetadata);
-//                rc.setStatus("public");
-//                if (target == null || target.trim().length() == 0) {
-//                    target = rc.getUrl();
-//                } else {
-//                    rc.setUrl(target);
-//                }
-//                try {
-//                    CrossRefRESTfullClient client = getClient();
-//                    retString = client.postMetadata(xmlMetadata);
-//                    client.postUrl(identifier.substring(identifier.indexOf(":") + 1), target);
-//
-//                } catch (UnsupportedEncodingException ex) {
-//                    logger.log(Level.SEVERE, null, ex);
-//
-//                } catch (RuntimeException rte) {
-//                    logger.log(Level.SEVERE, "Error creating DOI at DataCite: {0}", rte.getMessage());
-//                    logger.log(Level.SEVERE, "Exception", rte);
-//
-//                }
-//            }
-//        } else if (status.equals("unavailable")) {
-//            DOIDataCiteRegisterCache rc = findByDOI(identifier);
-//            try {
-//                CrossRefRESTfullClient client = getClient();
-//                if (rc != null) {
-//                    rc.setStatus("unavailable");
-//                    retString = client.inactiveDataset(identifier.substring(identifier.indexOf(":") + 1));
-//                }
-//            } catch (IOException ignored) {
-//            }
-//        }
-        return retString;
+
+        DOIDataCiteRegisterCache rc = findByDOI(identifier);
+        if (metadata.size() > 0) {
+            if (rc == null) {
+                rc = new DOIDataCiteRegisterCache();
+                rc.setDoi(identifier);
+                rc.setXml(xmlMetadata);
+                rc.setStatus("reserved");
+                rc.setUrl(target);
+                em.persist(rc);
+            } else {
+                rc.setDoi(identifier);
+                rc.setXml(xmlMetadata);
+                rc.setStatus("reserved");
+                rc.setUrl(target);
+            }
+        } else {
+            if (rc != null) {
+                rc.setDoi(identifier);
+                rc.setXml(xmlMetadata);
+                rc.setStatus("public");
+                if (target == null || target.trim().length() == 0) {
+                    target = rc.getUrl();
+                } else {
+                    rc.setUrl(target);
+                }
+                try {
+                    CrossRefRESTfullClient client = getClient();
+                    client.postMetadata(xmlMetadata);
+
+                } catch (UnsupportedEncodingException ex) {
+                    logger.log(Level.SEVERE, null, ex);
+
+                } catch (RuntimeException rte) {
+                    logger.log(Level.SEVERE, "Error creating DOI at DataCite: {0}", rte.getMessage());
+                    logger.log(Level.SEVERE, "Exception", rte);
+                }
+            }
+        }
+
     }
 
     public HashMap<String, String> getMetadata(String identifier) throws IOException {
@@ -217,15 +199,14 @@ public class DOICrossRefRegisterService {
         try {
             CrossRefRESTfullClient client = getClient();
             String jsonMetadata = client.getMetadata(identifier.substring(identifier.indexOf(":") + 1));
-            Map<String, Object> mappedJson = new ObjectMapper().readValue(jsonMetadata, HashMap.class);
+            new ObjectMapper().readValue(jsonMetadata, HashMap.class)
+                    .forEach((k, v) -> metadata.put(k.toString(), v.toString()));
             logger.log(Level.FINE, jsonMetadata);
-            metadata.put("_status", mappedJson.get("status").toString());
         } catch (RuntimeException e) {
             logger.log(Level.INFO, identifier, e);
         }
         return metadata;
     }
-
 }
 
 class CrossRefMetadataTemplate {
@@ -252,7 +233,7 @@ class CrossRefMetadataTemplate {
     private String databaseTitle;
     private String identifier;
     private String title;
-    private final String baseUrl = System.getProperty(getDataverseSiteUrlStatic());
+    private final String baseUrl = getDataverseSiteUrlStatic();
     private List<DatasetAuthor> authors;
 
     public List<DatasetAuthor> getAuthors() {

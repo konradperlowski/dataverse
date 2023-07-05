@@ -20,12 +20,14 @@ public class CrossRefRESTfullClient implements Closeable {
     private static final Logger logger = Logger.getLogger(CrossRefRESTfullClient.class.getCanonicalName());
 
     private final String url;
+    private final String apiUrl;
     private final String username;
     private final String password;
     private final CloseableHttpClient httpClient;
     private final String encoding = "utf-8";
 
     public CrossRefRESTfullClient(String url, String username, String password) {
+        this.apiUrl = "https://api.crossref.org";
         this.url = url;
         this.username = username;
         this.password = password;
@@ -33,7 +35,7 @@ public class CrossRefRESTfullClient implements Closeable {
     }
 
     public boolean testDOIExists(String doi) throws IOException {
-        HttpGet httpGet = new HttpGet(this.url + "/works/" + doi);
+        HttpGet httpGet = new HttpGet(this.apiUrl + "/works/" + doi);
         httpGet.setHeader("Accept", "application/json");
         HttpResponse response = httpClient.execute(httpGet);
         if (response.getStatusLine().getStatusCode() != 200) {
@@ -45,7 +47,7 @@ public class CrossRefRESTfullClient implements Closeable {
     }
 
     public String getMetadata(String doi) {
-        HttpGet httpGet = new HttpGet(this.url + "/works/" + doi);
+        HttpGet httpGet = new HttpGet(this.apiUrl + "/works/" + doi);
         httpGet.setHeader("Accept", "application/json");
         try {
             HttpResponse response = httpClient.execute(httpGet);

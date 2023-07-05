@@ -8,8 +8,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static edu.harvard.iq.dataverse.search.SearchConstants.PUBLIC;
-
 @Stateless
 public class DOICrossRefServiceBean extends AbstractGlobalIdServiceBean {
 
@@ -130,9 +128,6 @@ public class DOICrossRefServiceBean extends AbstractGlobalIdServiceBean {
         }
         String identifier = getIdentifier(dvObject);
         Map<String, String> metadata = getUpdateMetadata(dvObject);
-        metadata.put("_status", PUBLIC);
-        metadata.put("datacite.publicationyear", generateYear(dvObject));
-        metadata.put("_target", getTargetUrl(dvObject));
         try {
             doiCrossRefRegisterService.registerIdentifier(identifier, metadata, dvObject);
             return true;
